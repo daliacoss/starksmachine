@@ -4,7 +4,13 @@ a single operator (wrapper for an oscillator)
 function Operator(context){
 	this.oscillator = context.createOscillator();
 	this.velocity = context.createGain();
-	this.oscillator.connect(velocity);
+	this.oscillator.connect(this.velocity);
+
+	this.velocity.gain.value = 0;
+}
+
+Operator.prototype.connect = function(node){
+	this.velocity.connect(node);
 }
 
 /*
@@ -17,32 +23,34 @@ masterVolume (float, default=0.5): the starting volume (0.0 - 1.0)
 function Stark(context, numOperators, masterVolume){
 
 	// connections:
-	// [operators] -> [amps] -> velocity -> master amp -> destination
+	// [operators->velocities] -> [amps] -> master amp -> destination
 
 	this.context = context;
 	this.operators = [];
 	this.amps = [];
-	this.velocity = context.createGain();
+//	this.velocity = context.createGain();
 	this.masterAmp = context.createGain();
 
 	for (var i=0; i<numOperators; i++){
-		var op = context.createOscillator();
+		//var op = context.createOscillator();
+		//var amp = context.createGain();
+		var op = new Operator(context);
 		var amp = context.createGain();
 
 		op.connect(amp);
-		amp.connect(this.velocity);
+		amp.connect(this.masterAmp);
 
-		op.frequency.value = 440;
+		op.oscillator.frequency.value = 440;
 		amp.gain.value = !i * 1;
 
 		this.operators.push(op);
 		this.amps.push(amp);
 
-		op.start(0);
+		op.oscillator.start(0);
 	}
 
-	this.velocity.connect(this.masterAmp);
-	this.velocity.gain.value = 0;
+	//this.velocity.connect(this.masterAmp);
+	//this.velocity.gain.value = 0;
 	this.masterAmp.connect(context.destination);
 	// allow 0 volume, but not false or null
 	this.masterAmp.gain.value = (masterVolume === 0) ? 0 : masterVolume || 0.2;
@@ -103,14 +111,17 @@ velocity (float, default=1.0): 0.0 - 1.0
 */
 Stark.prototype.noteOnHz = function(freq, velocity){
 	for (var i=0; i<this.operators.length; i++){
-		this.operators[i].frequency.setValueAtTime(freq, this.context.currentTime);
+		if (freq){
+			this.operators[i].oscillator.frequency.setValueAtTime(freq, this.context.currentTime);
+		}
+		this.operators[i].velocity.gain.value = velocity;
 	}
-	this.velocity.gain.value = velocity;
+	//this.velocity.gain.value = velocity;
 }
 
 /*
 stop a note event
 */
 Stark.prototype.noteOff = function(){
-	this.velocity.gain.value = 0;
+	this.noteOnHz(null, 0);
 }

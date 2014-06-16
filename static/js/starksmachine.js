@@ -17,43 +17,6 @@ StarksMachine.prototype.play = function(x, y, width, height){
 	}
 }
 
-StarksMachine.prototype.mousedown = function(event){
-	if (event.which != 1){
-		return;
-	}
-
-	// var pitch = Math.floor(event.clientX / $(window).width() * 64) + 32;
-	// this._currentNote = pitch;
-	// this.instrument.noteOn(pitch, 1);
-	this.play(event.clientX, null, $(window).width());
-
-}
-
-StarksMachine.prototype.mouseup = function(event){
-	this.instrument.noteOff();
-	clearInterval(this._currentInterval);
-	this._currentNote = -1;
-}
-
-StarksMachine.prototype.mousemove = function(event){
-	if (this._currentNote == -1){
-		return;
-	}
-	this.mousedown(event);
-}
-
 window.onload = function(){
 	window.machine = new StarksMachine();
 }
-
-$(window).mousedown(function(event){
-	window.machine.mousedown(event);
-});
-
-$(window).mouseup(function(event){
-	window.machine.mouseup(event);
-});
-
-$(window).mousemove(function(event){
-	window.machine.mousemove(event);
-});

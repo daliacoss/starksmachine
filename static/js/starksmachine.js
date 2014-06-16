@@ -1,7 +1,9 @@
 function StarksMachine(){
 	this.context = new AudioContext();
 	this.instrument = new Stark(this.context, 2);
-	this.instrument.operators[0].oscillator.type = "square";
+	this.instrument.operators[0].oscillator.type = "triangle";
+	this.instrument.operators[1].oscillator.type = "sawtooth";
+	this.instrument.operators[1].oscillator.detune.value = 10;
 
 	this._currentNote = -1;
 	this._currentInterval;

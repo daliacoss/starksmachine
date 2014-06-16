@@ -41,7 +41,6 @@ function Stark(context, numOperators, masterVolume){
 		amp.connect(this.masterAmp);
 
 		op.oscillator.frequency.value = 440;
-		amp.gain.value = !i * 1;
 
 		this.operators.push(op);
 		this.amps.push(amp);

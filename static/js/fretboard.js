@@ -2,7 +2,12 @@ function Fretboard(){
 	this.context = new AudioContext();
 	this.instrument = new Stark(this.context, 2);
 	this.instrument.operators[0].oscillator.type = "triangle";
-	this.instrument.operators[1].oscillator.type = "sawtooth";
+	this.instrument.operators[0].envelope.attackTime = 0;
+	this.instrument.operators[0].envelope.releaseTime = .4;
+
+	this.instrument.operators[1].oscillator.type = "square";
+	this.instrument.operators[1].envelope.attackTime = 0;
+	this.instrument.operators[1].envelope.releaseTime = .4;
 	this.instrument.operators[1].oscillator.detune.value = 10;
 
 	this._currentNote = -1;
@@ -22,9 +27,6 @@ Fretboard.prototype.mousedown = function(event){
 		return;
 	}
 
-	// var pitch = Math.floor(event.clientX / $(window).width() * 64) + 32;
-	// this._currentNote = pitch;
-	// this.instrument.noteOn(pitch, 1);
 	this.play(event.clientX, null, $(window).width());
 
 }

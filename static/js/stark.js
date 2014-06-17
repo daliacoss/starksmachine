@@ -1,12 +1,59 @@
 /*
 a single operator (wrapper for an oscillator)
+
+context (AudioContext): the AudioContext to place the operator in
+envelope (object): adsr envelope. members:
+	envelope.attackTime (float, default=0)
+	envelope.decayTime (float, default=0)
+	envelope.sustainLevel (float, default=1): 0.0 - 1.0, relative to velocity
+	envelope.releaseTime (float, default=1)
+all speed values are in seconds
 */
-function Operator(context){
+function Operator(context, envelope){
+	this.context = context;
 	this.oscillator = context.createOscillator();
 	this.velocity = context.createGain();
+
+	envelope = envelope || {};
+	envelope.attackTime = envelope.attackTime || 0;
+	envelope.decayTime = envelope.decayTime || 0;
+	envelope.sustainLevel = envelope.sustainLevel || 1;
+	envelope.releaseTime = envelope.releaseTime || 0;
+	this.envelope = envelope;
+
+	//attack rate
+	//[attack level, aka velocity]
+	//decay rate
+	//sustain level
+	//release rate
+
 	this.oscillator.connect(this.velocity);
 
 	this.velocity.gain.value = 0;
+	this.oscillator.start(0);
+}
+
+Operator.prototype.setVelocity = function(value){
+	this.velocity.gain.value = value;
+}
+
+Operator.prototype.attack = function(value){
+	var now = this.context.currentTime;
+	this.velocity.gain.cancelScheduledValues(now);
+	this.velocity.gain.setValueAtTime(0, now);
+
+	this.velocity.gain.linearRampToValueAtTime(
+		value, now + this.envelope.attackTime
+	);
+}
+
+Operator.prototype.release = function(){
+	var now = this.context.currentTime;
+	this.velocity.gain.cancelScheduledValues(now);
+
+	this.velocity.gain.linearRampToValueAtTime(
+		0, now + this.envelope.releaseTime
+	);
 }
 
 Operator.prototype.connect = function(node){
@@ -44,8 +91,6 @@ function Stark(context, numOperators, masterVolume){
 
 		this.operators.push(op);
 		this.amps.push(amp);
-
-		op.oscillator.start(0);
 	}
 
 	//this.velocity.connect(this.masterAmp);
@@ -113,9 +158,13 @@ Stark.prototype.noteOnHz = function(freq, velocity){
 		if (freq){
 			this.operators[i].oscillator.frequency.setValueAtTime(freq, this.context.currentTime);
 		}
-		this.operators[i].velocity.gain.value = velocity;
+		if (velocity != 0){
+			this.operators[i].attack(velocity);
+		}
+		else {
+			this.operators[i].release();
+		}
 	}
-	//this.velocity.gain.value = velocity;
 }
 
 /*

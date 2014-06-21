@@ -39,11 +39,16 @@ Operator.prototype.setVelocity = function(value){
 
 Operator.prototype.attack = function(value){
 	var now = this.context.currentTime;
+	var envelope = this.envelope;
+
 	this.velocity.gain.cancelScheduledValues(now);
 	this.velocity.gain.setValueAtTime(0, now);
 
 	this.velocity.gain.linearRampToValueAtTime(
-		value, now + this.envelope.attackTime
+		value, now + envelope.attackTime
+	);
+	this.velocity.gain.linearRampToValueAtTime(
+		envelope.sustainLevel, now + envelope.attackTime + envelope.decayTime
 	);
 }
 

@@ -3,11 +3,15 @@ function Fretboard(){
 	this.instrument = new Stark(this.context, 2);
 	this.instrument.operators[0].oscillator.type = "triangle";
 	this.instrument.operators[0].envelope.attackTime = 0;
+	this.instrument.operators[0].envelope.decayTime = .1;
+	this.instrument.operators[0].envelope.sustainLevel = .6;
 	this.instrument.operators[0].envelope.releaseTime = .4;
 
 	this.instrument.operators[1].oscillator.type = "square";
 	this.instrument.operators[1].envelope.attackTime = 0;
+	this.instrument.operators[1].envelope.decayTime = .1;
 	this.instrument.operators[1].envelope.releaseTime = .4;
+	this.instrument.operators[1].envelope.sustainLevel = .6;
 	this.instrument.operators[1].oscillator.detune.value = 10;
 
 	this._currentNote = -1;

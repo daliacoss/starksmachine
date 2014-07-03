@@ -1,5 +1,5 @@
 /*
-a single operator (wrapper for an oscillator)
+a single operator (wrapper for an oscillator or effect)
 
 context (AudioContext): the AudioContext to place the operator in
 envelope (object): adsr envelope. members:
@@ -20,12 +20,6 @@ function Operator(context, envelope){
 	envelope.sustainLevel = envelope.sustainLevel || 1;
 	envelope.releaseTime = envelope.releaseTime || 0;
 	this.envelope = envelope;
-
-	//attack rate
-	//[attack level, aka velocity]
-	//decay rate
-	//sustain level
-	//release rate
 
 	this.oscillator.connect(this.velocity);
 
@@ -129,6 +123,10 @@ octave (int, default=0): octave if pitch is string
 */
 Stark.prototype.pitchToFrequency = function(pitch, octave){
 
+	if (! pitch){
+		return null;
+	}
+
 	var pitchClass;
 	if (typeof pitch == "string"){
 		pitchClass = pitchClassFreqs[pitch];
@@ -174,6 +172,7 @@ Stark.prototype.noteOnHz = function(freq, velocity){
 
 /*
 stop a note event
+equivalent to noteOnHz(null, 0)
 */
 Stark.prototype.noteOff = function(){
 	this.noteOnHz(null, 0);

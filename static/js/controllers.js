@@ -51,18 +51,15 @@ function VirtualKeyboard(instrument, element, defaultVelocity, octave){
 	this.element.keydown(function(event){
 
 		var pitch = vk.pitchMap[event.which] + (vk.octave * 12);
-		var lastNote = vk.currentNote;
 
-		if (! isNaN(pitch) && lastNote != pitch){
+		if (! isNaN(pitch) && vk.currentNote != pitch){
 			vk.instrument.noteOn(pitch, vk.defaultVelocity);
+			vk.currentNote = pitch;
 		}
-
-		vk.currentNote = pitch;		
 	});
 
 	this.element.keyup(function(event){
 
-		console.log(vk.currentNote);
 		if (vk.currentNote === vk.pitchMap[event.which] + (vk.octave * 12)){
 			vk.instrument.noteOff();
 
